@@ -27,9 +27,11 @@ we would use the freq from fft to figure out the sprite we're using
     %[pks,locs,w,p] = findpeaks(dft)
     
     landscape = imread('landscape.png');
-    plot(landscape);
+    %plot(landscape);
     
     latios = imread('latios.png');
-    clf;
-    axes('position',[0,0.9,0.1,0.1])
+    %axes('position',[0,0.9,0.1,0.1])
     imshow(latios)
+    
+    landscape(100, 50, latios);
+    imshow(landscape);
