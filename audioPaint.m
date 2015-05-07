@@ -1,4 +1,5 @@
 function [resultImage] = audioPaint(filename)
+<<<<<<< HEAD
 	[soundWave, Fs] = audioread(filename);
     %print soundWave
     soundWave
@@ -22,4 +23,15 @@ we would use the freq from fft to figure out the sprite we're using
     %find peaks in data
     %[pks,locs,w,p] = findpeaks(dft)
     
+=======
+    landscape = imread('landscape.png'),
+    imshow(landscape),
+	[soundWave, Fs] = audioread(filename),
+    soundSize = size(soundWave),
+    
+    monoSound = (soundWave(:,1) + soundWave(:,2))/2,
+    
+    
+
+>>>>>>> origin/master
 end
