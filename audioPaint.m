@@ -33,7 +33,7 @@ we would use the freq from fft to figure out the sprite we're using
     %landscape(100, 50, latios);
     %imshow(landscape);
         
-    C = imfuse(landscape, latias,'falsecolor','Scaling','joint','ColorChannels',[1 2 2]);
+    C = imfuse(landscape, latias,'blend','Scaling','joint');
     imshow(C);
     %image sequencing for videos: http://www.mathworks.com/help/images/what-is-an-image-sequence.html
     %databasing images: http://www.mathworks.com/matlabcentral/answers/159725-how-to-create-images-database-in-matlab-to-store-5-images
