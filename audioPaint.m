@@ -1,5 +1,5 @@
 function [resultImage] = audioPaint(filename)
-	[soundWave, Fs] = audioread(filename);
+    [soundWave, Fs] = audioread(filename);
     soundSize = size(soundWave);
     
     monoSound = (soundWave(:,1) + soundWave(:,2))/2;
