@@ -1,5 +1,6 @@
 function [resultImage] = audioPaint(filename)
 	[soundWave, Fs] = audioread(filename);
+    landscape = imread('landscape.png');
     %print soundWave
     soundWave
     %get the discrete fourier transform using fft
