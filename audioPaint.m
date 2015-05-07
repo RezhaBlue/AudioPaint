@@ -1,7 +1,7 @@
 function [resultImage] = audioPaint(filename)
 	[soundWave, Fs] = audioread(filename);
     %print soundWave
-    soundWave
+    soundWave;
     [soundWave, Fs] = audioread('intldrop.wav');
     monoSound = (soundWave(:,1) + soundWave(:,2))/2;
     monoSize = size(monoSound);
@@ -31,7 +31,8 @@ we would use the freq from fft to figure out the sprite we're using
     
     latios = imread('latios.png');
     %axes('position',[0,0.9,0.1,0.1])
-    imshow(latios)
     
-    landscape(100, 50, latios);
+    [height, width, dim] = size(latios);
+    
+    landscape(100+height, 50+width, :) = latios;
     imshow(landscape);
