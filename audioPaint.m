@@ -29,12 +29,12 @@ we would use the freq from fft to figure out the sprite we're using
     landscape = imread('landscape.png');
     
     latias = imread('latias.png');
-    
+    latios = imread('latios.png');
     %landscape(100, 50, latios);
     %imshow(landscape);
         
-    C = imfuse(landscape, latias,'blend','Scaling','joint');
-    imshow(C);
+    C = imshowpair(landscape, latias,'blend','Scaling','none');
+    
     %image sequencing for videos: http://www.mathworks.com/help/images/what-is-an-image-sequence.html
     %databasing images: http://www.mathworks.com/matlabcentral/answers/159725-how-to-create-images-database-in-matlab-to-store-5-images
     %overlaying: http://stackoverflow.com/questions/11486956/how-to-overlay-several-images-in-matlab
