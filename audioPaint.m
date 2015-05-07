@@ -1,7 +1,7 @@
 function [resultImage] = audioPaint(filename)
 	[soundWave, Fs] = audioread(filename);
     %print soundWave
-    soundWave
+    soundWave;
     [soundWave, Fs] = audioread('intldrop.wav');
     monoSound = (soundWave(:,1) + soundWave(:,2))/2;
     monoSize = size(monoSound);
@@ -27,17 +27,13 @@ we would use the freq from fft to figure out the sprite we're using
     %[pks,locs,w,p] = findpeaks(dft)
     
     landscape = imread('landscape.png');
-    %plot(landscape);
     
-    latios = imread('latios.png');
-    %axes('position',[0,0.9,0.1,0.1])
-    imshow(latios)
+    latias = imread('latias.png');
     
     %landscape(100, 50, latios);
     %imshow(landscape);
         
-    C = imfuse(landscape, latios)
-    
+    C = imfuse(landscape, latias,'falsecolor','Scaling','joint','ColorChannels',[1 2 2]);
     imshow(C);
     %image sequencing for videos: http://www.mathworks.com/help/images/what-is-an-image-sequence.html
     %databasing images: http://www.mathworks.com/matlabcentral/answers/159725-how-to-create-images-database-in-matlab-to-store-5-images
