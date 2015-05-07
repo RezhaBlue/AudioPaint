@@ -23,8 +23,8 @@ we would use the freq from fft to figure out the sprite we're using
 %}
     %find peaks in data
     %findpeaks(monoSound)
+    %[pks,locs,w,p] = findpeaks(dft)
     
     landscape = imread('landscape.png');
     %imshow(landscape);
-
 end
