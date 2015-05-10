@@ -27,18 +27,19 @@ we would use the freq from fft to figure out the sprite we're using
     %[pks,locs,w,p] = findpeaks(dft)
     
     %replace these x and y values with dyanamic ones
-    x = 100; y = 100;
+    x = 0; y = 0;
+    %xrange = (0, 1739), yrange = (0,977)
     landscape = imread('landscape.png');
     
     latias = imread('latias.png');
-    [im_x, im_y, dim] = size(latias);
+    [im_y, im_x, dim] = size(latias);
     
-    blend_im = zeros(im_x, im_y, dim, 'uint8');
-    patch1 = landscape(x+1:x+im_x, y+1:y+im_y, :);
+    blend_im = zeros(im_y, im_x, dim, 'uint8');
+    patch1 = landscape(y+1:y+im_y, x+1:x+im_x, :);
     patch2 = latias;
     mask = (patch2 == 0);
     blend_im = uint8(mask) .* patch1 + (1-uint8(mask)) .* patch2;
-    landscape(x+1:x+im_x, y+1:y+im_y,:) = blend_im;
+    landscape(y+1:y+im_y, x+1:x+im_x,:) = blend_im;
     imshow(landscape);
     
     %landscape(100, 50, latios);
