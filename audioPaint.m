@@ -60,11 +60,14 @@ function [resultImage] = audioPaint(filename)
       % matrix
       lx = nr;
       m = (c > [c(1,:);c(1:(lx-1),:)]) & (c >= [c(2:lx,:);1+c(lx,:)]);
-    m
+    end
+    
+    %this matrix indicates where the beats are
+    m;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% find the x and y for the peak of each beat
-% extract sprite from image database based on freq
+% use i of m(i) as x value, c(i) as y value
+% extract sprite from image database based on freq (monoSound(i)?)
 % mask area derived from x and y on canvas
 % overlay sprite at x and y
 
