@@ -12,7 +12,7 @@ function [resultImage] = audioPaint(filename)
 	%[soundWave, Fs] = audioread(filename);
 
     % Organize bandlimits
-    if nargin < 3, bandlimits = [0 200 400 800 1600 3200]; end
+    if nargin < 3, bandlimits = [200]; end
     if nargin < 4, maxfreq = 4096; end
     
     % Read in audio file
@@ -65,7 +65,13 @@ function [resultImage] = audioPaint(filename)
     
     %this matrix indicates where the beats are
     m;
-    M = reshape(m',1, numel(m));
+    %M = reshape(m, 23400, 1080, 23400, 1920);
+    M = reshape(m',1, numel(m)); %indices of 1 = x-values
+    %C = reshape(m, 23400, 1080, 23400, 1920);
+    C = reshape(c',1, numel(c));
+    xval = find(M); % x-values
+    yval = C(M); %y-values
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % use i of m(i) as x value, c(i) as y value
 % extract sprite from image database based on freq (monoSound(i)?)
@@ -73,19 +79,36 @@ function [resultImage] = audioPaint(filename)
 % overlay sprite at x and y
 
     landscape = imread('landscape.png');
-    %{
-    for i = 1:length(M)
-        if M(i) == 1
+
+    for i = 1:length(xval)
+
+            sprite = imread('latias.png');
+            [im_y, im_x, dim] = size(sprite);
+            x = mod(xval(i), 1920);
+            y = floor((yval(i)) * 10000);
+            if x < im_x
+                x = 0;
+            end
+            if x > 1920 - im_x
+                x = 1920 - im_x;
+            end
+            if y < im_y
+                y = 0;
+            end
+            if y > 1080 - im_y
+                y = 1080 - im_y
+            end
             %overlay sprite on canvas
-            x = mod(i, 1920)
-            y = c(i) * 100
-
-
-        end
+            blend_im = zeros(im_y, im_x, dim, 'uint8');
+            patch1 = landscape(y+1:y+im_y, x+1:x+im_x, :);
+            patch2 = sprite;
+            mask = (patch2 == 0);
+            blend_im = uint8(mask) .* patch1 + (1-uint8(mask)) .* patch2;
+            landscape(y+1:y+im_y, x+1:x+im_x,:) = blend_im;
     end
-    %}
+
     
-    %imshow(landscape);
+    imshow(landscape);
 
     %{
     %replace these x and y values with dyanamic ones
