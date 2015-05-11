@@ -27,6 +27,7 @@ function [resultImage] = audioPaint(filename)
     status = 'differentiating first song...'
     c = diffrect(b, length(bandlimits));
     status = 'comb filtering first song...'
+    plot(c)
 
     %{ 
     Recursively calls timecomb to decrease computational time
@@ -64,14 +65,29 @@ function [resultImage] = audioPaint(filename)
     
     %this matrix indicates where the beats are
     m;
-
+    M = reshape(m',1, numel(m));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % use i of m(i) as x value, c(i) as y value
 % extract sprite from image database based on freq (monoSound(i)?)
 % mask area derived from x and y on canvas
 % overlay sprite at x and y
 
+    landscape = imread('landscape.png');
+    %{
+    for i = 1:length(M)
+        if M(i) == 1
+            %overlay sprite on canvas
+            x = mod(i, 1920)
+            y = c(i) * 100
+
+
+        end
+    end
+    %}
     
+    %imshow(landscape);
+
+    %{
     %replace these x and y values with dyanamic ones
     x = 0; y = 0; %xrange = (0, 1739), yrange = (0,977)
     
@@ -90,7 +106,7 @@ function [resultImage] = audioPaint(filename)
     blend_im = uint8(mask) .* patch1 + (1-uint8(mask)) .* patch2;
     landscape(y+1:y+im_y, x+1:x+im_x,:) = blend_im;
     %imshow(landscape);
-     
+     %}
        
     
     %image sequencing for videos: http://www.mathworks.com/help/images/what-is-an-image-sequence.html
