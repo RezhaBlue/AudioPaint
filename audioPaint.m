@@ -28,13 +28,39 @@ function [resultImage] = audioPaint(filename)
     c = diffrect(b, length(bandlimits));
     status = 'comb filtering first song...'
 
-    % Recursively calls timecomb to decrease computational time
+    %{ 
+    Recursively calls timecomb to decrease computational time
     d = timecomb(c, 2, 60, 240, bandlimits, maxfreq);
     e = timecomb(c, .5, d-2, d+2, bandlimits, maxfreq);
     f = timecomb(c, .1, e-.5, e+.5, bandlimits, maxfreq);
     g = timecomb(c, .01, f-.1, f+.1, bandlimits, maxfreq);
+    %}
+    
+    [nr,nc] = size(c);
 
-    monosound_bpm = g;
+    if nr == 1
+      lx = nc;
+    elseif nc == 1
+      lx = nr;
+      c = c';
+    else
+      lx = nr;
+    end
+
+    if (nr == 1) || (nc == 1)
+
+      m = (c > [c(1),c(1:(lx-1))]) & (c >= [c(2:lx),1+c(lx)]);
+
+      if nc == 1
+        % retranspose
+        m = m';
+      end
+
+    else
+      % matrix
+      lx = nr;
+      m = (c > [c(1,:);c(1:(lx-1),:)]) & (c >= [c(2:lx,:);1+c(lx,:)]);
+    m
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % find the x and y for the peak of each beat
@@ -60,7 +86,7 @@ function [resultImage] = audioPaint(filename)
     mask = (patch2 == 0);
     blend_im = uint8(mask) .* patch1 + (1-uint8(mask)) .* patch2;
     landscape(y+1:y+im_y, x+1:x+im_x,:) = blend_im;
-    imshow(landscape);
+    %imshow(landscape);
      
        
     
