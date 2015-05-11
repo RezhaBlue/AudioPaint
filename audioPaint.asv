@@ -1,44 +1,68 @@
 function [resultImage] = audioPaint(filename)
-	[soundWave, Fs] = audioread(filename);
-    %print soundWave
-    soundWave;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%set bandwidth limits for dividing sample
+%read in sample
+%divide sample into its frequency bands
+%reduce signal down to its envelope
+%differentiate envelopes
+%convolve signals to see which give highest energy outputs (these are the
+%beats)
+
+	%[soundWave, Fs] = audioread(filename);
+
+    % Organize bandlimits
+    if nargin < 3, bandlimits = [0 200 400 800 1600 3200]; end
+    if nargin < 4, maxfreq = 4096; end
+    
+    % Read in audio file
     [soundWave, Fs] = audioread('intldrop.wav');
     monoSound = (soundWave(:,1) + soundWave(:,2))/2;
-    monoSize = size(monoSound);
-    %get the discrete fourier transform using fft
-    dft = fft(monoSound);
-    freq = 0:Fs/length(monoSound):Fs/2;
-    %cut the dft down to half length
-    dft = dft(1:length(monoSound)/2+1);
-    %plots the frequencies for the dft
-    %%%plot(freq,abs(dft));
-    %shows the peaks
-    psdest = psd(spectrum.periodogram,monoSound,'Fs',Fs,'NFFT',length(soundWave));
-    %plot(psdest)
     
-%{ 
-denoting xcoord= fft(audiosignal(i)) and ycoord = abs(X(i))
-and then plot pikasprite at that given x and y on a canvas
-wait xcoord should eb the time not the fft itself
-we would use the freq from fft to figure out the sprite we're using
-%}
-    %find peaks in data
-    %findpeaks(monoSound)
-    %[pks,locs,w,p] = findpeaks(dft)
+    % Implements beat detection algorithm for the song
+    status = 'filtering first song...'
+    a = filterbank(monoSound, bandlimits, maxfreq);
+    status = 'windowing first song...'
+    b = hwindow(a, 0.2, bandlimits, maxfreq);
+    status = 'differentiating first song...'
+    c = diffrect(b, length(bandlimits));
+    status = 'comb filtering first song...'
+
+    % Recursively calls timecomb to decrease computational time
+    d = timecomb(c, 2, 60, 240, bandlimits, maxfreq);
+    e = timecomb(c, .5, d-2, d+2, bandlimits, maxfreq);
+    f = timecomb(c, .1, e-.5, e+.5, bandlimits, maxfreq);
+    g = timecomb(c, .01, f-.1, f+.1, bandlimits, maxfreq);
+
+    monosound_bpm = g;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% xcoord= fft(audiosignal(i)) and ycoord = abs(X(i))
+% plot sprite at x and y
+% use freq from fft to figure out which sprite to use
+
     
+    %replace these x and y values with dyanamic ones
+    x = 0; y = 0; %xrange = (0, 1739), yrange = (0,977)
+    
+    %import canvas image
     landscape = imread('landscape.png');
     
-    latias = imread('latias.png');
+    %import sprite
+    %%%need image database code for picking a sprite here
+    sprite = imread('latias.png');
+    [im_y, im_x, dim] = size(sprite);
+    %overlay sprite on canvas
+    blend_im = zeros(im_y, im_x, dim, 'uint8');
+    patch1 = landscape(y+1:y+im_y, x+1:x+im_x, :);
+    patch2 = sprite;
+    mask = (patch2 == 0);
+    blend_im = uint8(mask) .* patch1 + (1-uint8(mask)) .* patch2;
+    landscape(y+1:y+im_y, x+1:x+im_x,:) = blend_im;
+    imshow(landscape);
+     
+       
     
-    %landscape(100, 50, latios);
-    %imshow(landscape);
-        
-    C = imfuse(landscape, latias,'blend','Scaling','none');
-    C = imfuse(latios, latias,'blend','Scaling','none');
-    
-    imshow(C);
     %image sequencing for videos: http://www.mathworks.com/help/images/what-is-an-image-sequence.html
     %databasing images: http://www.mathworks.com/matlabcentral/answers/159725-how-to-create-images-database-in-matlab-to-store-5-images
-    %overlaying: http://stackoverflow.com/questions/11486956/how-to-overlay-several-images-in-matlab
     
 end
