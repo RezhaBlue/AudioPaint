@@ -27,7 +27,7 @@ function [resultImage] = audioPaint(filename)
     status = 'differentiating first song...'
     c = diffrect(b, length(bandlimits));
     status = 'comb filtering first song...'
-    plot(c)
+
 
     %{ 
     Recursively calls timecomb to decrease computational time
@@ -65,25 +65,24 @@ function [resultImage] = audioPaint(filename)
     
     M = m(1:716160); %chopped off last 318 elem -> multiple of 1920
     M = reshape(M, [373 1920]); %width -> 1920
-    M = floor(mean(M).*9); %avg dec. -> binary; 9 = beat+noise, 10 = noise
-    M = reshape(M, [1920 1]);
+    M = logical(floor(mean(M).*9)); %avg dec. -> binary; 9 = beat+noise, 10 = noise
+    %needs to be logical to be used for indexing
+    
     %repeat for C
     C = c(1:716160);
     C = reshape(C, [373 1920]);
     C = floor(mean(C)*20000); %brings max y-range to 1000, not max y-value
-    M = reshape(M, [1920 1]);
-%{
+    
+%%{
     %for comparing to original beat filtration, pretty damn good
     subplot(2,2,1)
     plot(c)
     subplot (2,2,2)
-    plot(D)
+    plot(C)
     subplot(2,2,3)
     plot(M)
-    subplot (2,2,4)
-    plot(C)
 
-%}  
+%%}  
 
     xval = find(M); % x-values
     yval = C(M); %y-values
@@ -115,14 +114,16 @@ function [resultImage] = audioPaint(filename)
             end
             %overlay sprite on canvas
             blend_im = zeros(im_y, im_x, dim, 'uint8');
-            patch1 = landscape(y+1:y+im_y, x+1:x+im_x, :);
+            patch1 = landscape(flipud(y+1):flipud(y+im_y), x+1:x+im_x, :);
             patch2 = sprite;
             mask = (patch2 == 0);
             blend_im = uint8(mask) .* patch1 + (1-uint8(mask)) .* patch2;
             landscape(y+1:y+im_y, x+1:x+im_x,:) = blend_im;
     end
     
-    %imshow(landscape);
+    %comment out subplot to see landscape by itself
+    subplot(2,2,4);
+    imshow(landscape);
 
     %{
     %replace these x and y values with dyanamic ones
