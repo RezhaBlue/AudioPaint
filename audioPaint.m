@@ -89,9 +89,9 @@ function [resultImage] = audioPaint(filename)
             x = mod(xval(i), 1920);
             y = floor((yval(i)) * 10000);
             if y < 792
-                sprite = imread(strcat(fullfile(pwd, fly_path), pokemon_fly(mod(y, length(pokemon_fly))).name));
+                sprite = imread(strcat(fullfile(pwd, fly_path), pokemon_fly(mod(y, length(pokemon_fly))+ 1).name));
             else
-                sprite = imread(strcat(fullfile(pwd, ground_path), pokemon_ground(mod(y, length(pokemon_ground))).name));
+                sprite = imread(strcat(fullfile(pwd, ground_path), pokemon_ground(mod(y, length(pokemon_ground))+1).name));
             end
             
             [im_y, im_x, dim] = size(sprite);
@@ -106,7 +106,7 @@ function [resultImage] = audioPaint(filename)
                 y = 0;
             end
             if y > 1080 - im_y
-                y = 1080 - im_y
+                y = 1080 - im_y;
             end
             %overlay sprite on canvas
             blend_im = zeros(im_y, im_x, dim, 'uint8');
