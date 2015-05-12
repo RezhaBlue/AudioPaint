@@ -63,29 +63,44 @@ function [resultImage] = audioPaint(filename)
       m = (c > [c(1,:);c(1:(lx-1),:)]) & (c >= [c(2:lx,:);1+c(lx,:)]);
     end
     
-    %this matrix indicates where the beats are
-    m;
-    M = reshape(m, 23400, 1080, 23400, 1920)
-    M = reshape(m',1, numel(m)); %indices of 1 = x-values
-    M = reshape(m, 23400, 1080, 23400, 1920)
-    C = reshape(c',1, numel(c));
+    M = m(1:716160); %chopped off last 318 elem -> multiple of 1920
+    M = reshape(M, [373 1920]); %width -> 1920
+    M = floor(mean(M).*9); %avg dec. -> binary; 9 = beat+noise, 10 = noise
+    M = reshape(M, [1920 1]);
+    %repeat for C
+    C = c(1:716160);
+    C = reshape(C, [373 1920]);
+    C = floor(mean(C)*20000); %brings max y-range to 1000, not max y-value
+    M = reshape(M, [1920 1]);
+%{
+    %for comparing to original beat filtration, pretty damn good
+    subplot(2,2,1)
+    plot(c)
+    subplot (2,2,2)
+    plot(D)
+    subplot(2,2,3)
+    plot(M)
+    subplot (2,2,4)
+    plot(C)
+
+%}  
+
     xval = find(M); % x-values
     yval = C(M); %y-values
-    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% use i of m(i) as x value, c(i) as y value
+% use xval(i) as x value, yval(i) as y value
 % extract sprite from image database based on freq (monoSound(i)?)
 % mask area derived from x and y on canvas
 % overlay sprite at x and y
 
     landscape = imread('landscape.png');
-
+    
     for i = 1:length(xval)
 
             sprite = imread('latias.png');
             [im_y, im_x, dim] = size(sprite);
             x = mod(xval(i), 1920);
-            y = (yval(i)) * 10000;
+            y = yval(i);
             if x < im_x
                 x = 0;
             end
@@ -106,9 +121,8 @@ function [resultImage] = audioPaint(filename)
             blend_im = uint8(mask) .* patch1 + (1-uint8(mask)) .* patch2;
             landscape(y+1:y+im_y, x+1:x+im_x,:) = blend_im;
     end
-
     
-    imshow(landscape);
+    %imshow(landscape);
 
     %{
     %replace these x and y values with dyanamic ones
