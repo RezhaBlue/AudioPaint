@@ -27,7 +27,6 @@ function [resultImage] = audioPaint(filename)
     status = 'differentiating first song...'
     c = diffrect(b, length(bandlimits));
     status = 'comb filtering first song...'
-    plot(c)
 
     %{ 
     Recursively calls timecomb to decrease computational time
@@ -79,13 +78,24 @@ function [resultImage] = audioPaint(filename)
 % overlay sprite at x and y
 
     landscape = imread('landscape.png');
-
+    
+    fly_path = '\pokemon\flying\';
+    ground_path = '\pokemon\ground\';
+    imgType = '*.png';
+    pokemon_fly = dir(fullfile(pwd, [fly_path imgType]));
+    pokemon_ground = dir(fullfile(pwd, [ground_path imgType]));
+   
     for i = 1:length(xval)
-
-            sprite = imread('latias.png');
-            [im_y, im_x, dim] = size(sprite);
             x = mod(xval(i), 1920);
             y = floor((yval(i)) * 10000);
+            if y < 792
+                sprite = imread(strcat(fullfile(pwd, fly_path), pokemon_fly(mod(y, length(pokemon_fly))).name));
+            else
+                sprite = imread(strcat(fullfile(pwd, ground_path), pokemon_ground(mod(y, length(pokemon_ground))).name));
+            end
+            
+            [im_y, im_x, dim] = size(sprite);
+
             if x < im_x
                 x = 0;
             end
@@ -99,7 +109,7 @@ function [resultImage] = audioPaint(filename)
                 y = 1080 - im_y
             end
             %overlay sprite on canvas
-            blend_im = zeros(im_y, im_x, dim, 'uint8');
+            blend_im = zeros(im_y, im_x, 3, 'uint8');
             patch1 = landscape(y+1:y+im_y, x+1:x+im_x, :);
             patch2 = sprite;
             mask = (patch2 == 0);
