@@ -109,7 +109,7 @@ function [resultImage] = audioPaint(filename)
                 y = 1080 - im_y
             end
             %overlay sprite on canvas
-            blend_im = zeros(im_y, im_x, 3, 'uint8');
+            blend_im = zeros(im_y, im_x, dim, 'uint8');
             patch1 = landscape(y+1:y+im_y, x+1:x+im_x, :);
             patch2 = sprite;
             mask = (patch2 == 0);
