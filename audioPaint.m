@@ -67,6 +67,17 @@ function [resultImage] = audioPaint(filename)
     M = logical(floor(mean(M).*9)); %avg dec. -> binary; 9 = beat+noise, 10 = noise
     %needs to be logical to be used for indexing
     %repeat for C
+    
+    for i = 1:length(M)
+        if M(i) == 1
+            for t = i-10: i-1
+                M(t) = 0;
+            end
+            for y = i+1:i+10
+                M(y) = 0;
+            end
+        end
+    end
     C = c(1:716160);
     C = reshape(C, [373 1920]);
     C = floor(mean(C)*20000); %brings max y-range to 1000, not max y-value
@@ -102,7 +113,7 @@ function [resultImage] = audioPaint(filename)
     pokemon_ground = dir(fullfile(pwd, [ground_path imgType]));
    
     for i = 1:length(xval)
-            x = mod(xval(i), 1920);
+            x = (xval(i));
             y = floor((yval(i)));
             if y < 792
                 sprite = imread(strcat(fullfile(pwd, fly_path), pokemon_fly(mod(y + x, length(pokemon_fly))+ 1).name));
