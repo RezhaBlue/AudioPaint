@@ -62,12 +62,28 @@ function [resultImage] = audioPaint(filename)
       m = (c > [c(1,:);c(1:(lx-1),:)]) & (c >= [c(2:lx,:);1+c(lx,:)]);
     end
     
-    %this matrix indicates where the beats are
-    m;
-    %M = reshape(m, 23400, 1080, 23400, 1920);
-    M = reshape(m',1, numel(m)); %indices of 1 = x-values
-    %C = reshape(m, 23400, 1080, 23400, 1920);
-    C = reshape(c',1, numel(c));
+    M = m(1:716160); %chopped off last 318 elem -> multiple of 1920
+    M = reshape(M, [373 1920]); %width -> 1920
+    M = logical(floor(mean(M).*9)); %avg dec. -> binary; 9 = beat+noise, 10 = noise
+    %needs to be logical to be used for indexing
+    %repeat for C
+    C = c(1:716160);
+    C = reshape(C, [373 1920]);
+    C = floor(mean(C)*20000); %brings max y-range to 1000, not max y-value
+    
+%{
+    %for comparing to original beat filtration, pretty damn good
+    subplot(2,2,1)
+    plot(c)
+    subplot (2,2,2)
+    plot(D)
+    subplot(2,2,3)
+    plot(M)
+    subplot (2,2,4)
+    plot(C)
+
+%}  
+    
     xval = find(M); % x-values
     yval = C(M); %y-values
     
@@ -79,7 +95,7 @@ function [resultImage] = audioPaint(filename)
 
     landscape = imread('landscape.png');
     
-fly_path = '\pokemon\flying\';
+    fly_path = '\pokemon\flying\';
     ground_path = '\pokemon\ground\';
     imgType = '*.png';
     pokemon_fly = dir(fullfile(pwd, [fly_path imgType]));
@@ -87,11 +103,11 @@ fly_path = '\pokemon\flying\';
    
     for i = 1:length(xval)
             x = mod(xval(i), 1920);
-            y = floor((yval(i)) * 10000);
+            y = floor((yval(i)));
             if y < 792
-                sprite = imread(strcat(fullfile(pwd, fly_path), pokemon_fly(mod(y, length(pokemon_fly))+ 1).name));
+                sprite = imread(strcat(fullfile(pwd, fly_path), pokemon_fly(mod(y + x, length(pokemon_fly))+ 1).name));
             else
-                sprite = imread(strcat(fullfile(pwd, ground_path), pokemon_ground(mod(y, length(pokemon_ground))+1).name));
+                sprite = imread(strcat(fullfile(pwd, ground_path), pokemon_ground(mod(y + x, length(pokemon_ground))+1).name));
             end
             
             [im_y, im_x, dim] = size(sprite);
