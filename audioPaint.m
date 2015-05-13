@@ -1,4 +1,4 @@
-function [resultImage] = audioPaint(filename)
+function [resultImage] = audioPaint
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %set bandwidth limits for dividing sample
 %read in sample
@@ -9,14 +9,15 @@ function [resultImage] = audioPaint(filename)
 %beats)
 % https://www.clear.rice.edu/elec301/Projects01/beat_sync/beatalgo.html
 
-	%[soundWave, Fs] = audioread(filename);
-
     % Organize bandlimits
     if nargin < 3, bandlimits = [200]; end
     if nargin < 4, maxfreq = 4096; end
     
+    [fileName,filePath] = uigetfile('*.mp3', 'Select a sound file');
+    pathToFile = fullfile(filePath,fileName);
+    
     % Read in audio file
-    [soundWave, Fs] = audioread('intldrop.wav');
+    [soundWave, Fs] = audioread(pathToFile);
     monoSound = (soundWave(:,1) + soundWave(:,2))/2;
     
     % Implements beat detection algorithm for the song
@@ -62,8 +63,17 @@ function [resultImage] = audioPaint(filename)
       m = (c > [c(1,:);c(1:(lx-1),:)]) & (c >= [c(2:lx,:);1+c(lx,:)]);
     end
     
-    M = m(1:716160); %chopped off last 318 elem -> multiple of 1920
-    M = reshape(M, [373 1920]); %width -> 1920
+    length(m)
+    
+    for i = length(m):-1:1
+        if rem(i,1920) == 0
+            cutoff = i;
+            break
+        end
+    end
+    
+    M = m(1:cutoff); %chopped off last elements -> multiple of 1920
+    M = reshape(M, [cutoff/1920 1920]); %width -> 1920
     M = logical(floor(mean(M).*9)); %avg dec. -> binary; 9 = beat+noise, 10 = noise
     %needs to be logical to be used for indexing
     %repeat for C
@@ -71,15 +81,19 @@ function [resultImage] = audioPaint(filename)
     for i = 1:length(M)
         if M(i) == 1
             for t = i-10: i-1
-                M(t) = 0;
+                if t > 0
+                    M(t) = 0;
+                end
             end
             for y = i+1:i+10
-                M(y) = 0;
+                if y < length(M)
+                    M(y) = 0;
+                end
             end
         end
     end
-    C = c(1:716160);
-    C = reshape(C, [373 1920]);
+    C = c(1:cutoff);
+    C = reshape(C, [cutoff/1920 1920]);
     C = floor(mean(C)*20000); %brings max y-range to 1000, not max y-value
     
 %{
