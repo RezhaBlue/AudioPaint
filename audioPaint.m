@@ -80,12 +80,12 @@ function [resultImage] = audioPaint
     
     for i = 1:length(M)
         if M(i) == 1
-            for t = i-10: i-1
+            for t = i-30: i-1
                 if t > 0
                     M(t) = 0;
                 end
             end
-            for y = i+1:i+10
+            for y = i+1:i+30
                 if y < length(M)
                     M(y) = 0;
                 end
