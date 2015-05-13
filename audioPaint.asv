@@ -20,6 +20,13 @@ function [resultImage] = audioPaint
     [soundWave, Fs] = audioread(pathToFile);
     monoSound = (soundWave(:,1) + soundWave(:,2))/2;
     
+    %select a background
+    [fileName,filePath] = uigetfile('*.png', 'Select a landscape/background');
+    pathToFile = fullfile(filePath,fileName);
+    landscape = imread(pathToFile);
+    
+    [land_x, land_y, land_dim] = size(landscape);
+    
     % Implements beat detection algorithm for the song
     status = 'filtering first song...'
     a = filterbank(monoSound, bandlimits, maxfreq);
@@ -66,14 +73,14 @@ function [resultImage] = audioPaint
     length(m)
     
     for i = length(m):-1:1
-        if rem(i,1920) == 0
+        if rem(i,land_x) == 0
             cutoff = i;
             break
         end
     end
     
     M = m(1:cutoff); %chopped off last elements -> multiple of 1920
-    M = reshape(M, [cutoff/1920 1920]); %width -> 1920
+    M = reshape(M, [cutoff/land_x land_x]); %width -> 1920
     M = logical(floor(mean(M).*9)); %avg dec. -> binary; 9 = beat+noise, 10 = noise
     %needs to be logical to be used for indexing
     %repeat for C
@@ -93,7 +100,7 @@ function [resultImage] = audioPaint
         end
     end
     C = c(1:cutoff);
-    C = reshape(C, [cutoff/1920 1920]);
+    C = reshape(C, [cutoff/land_x land_x]);
     C = floor(mean(C)*20000); %brings max y-range to 1000, not max y-value
     
 %{
@@ -141,13 +148,13 @@ function [resultImage] = audioPaint
                 x = 0;
             end
             if x > 1920 - im_x
-                x = 1920 - im_x;
+                x = land_x - im_x;
             end
             if y < im_y
                 y = 0;
             end
-            if y > 1080 - im_y
-                y = 1080 - im_y;
+            if y > land_y - im_y
+                y = land_y - im_y;
             end
             %overlay sprite on canvas
             blend_im = zeros(im_y, im_x, dim, 'uint8');
@@ -157,8 +164,31 @@ function [resultImage] = audioPaint
             blend_im = uint8(mask) .* patch1 + (1-uint8(mask)) .* patch2;
             landscape(y+1:y+im_y, x+1:x+im_x,:) = blend_im;
     end
+
     
     imshow(landscape);
+
+    %{
+    %replace these x and y values with dyanamic ones
+    x = 0; y = 0; %xrange = (0, 1739), yrange = (0,977)
+    
+    %import canvas image
+    landscape = imread('landscape.png');
+    
+    %import sprite
+    %%%need image database code for picking a sprite here
+    sprite = imread('latias.png');
+    [im_y, im_x, dim] = size(sprite);
+    %overlay sprite on canvas
+    blend_im = zeros(im_y, im_x, dim, 'uint8');
+    patch1 = landscape(y+1:y+im_y, x+1:x+im_x, :);
+    patch2 = sprite;
+    mask = (patch2 == 0);
+    blend_im = uint8(mask) .* patch1 + (1-uint8(mask)) .* patch2;
+    landscape(y+1:y+im_y, x+1:x+im_x,:) = blend_im;
+    %imshow(landscape);
+     %}
+       
     
     %image sequencing for videos: http://www.mathworks.com/help/images/what-is-an-image-sequence.html
     %databasing images: http://www.mathworks.com/matlabcentral/answers/159725-how-to-create-images-database-in-matlab-to-store-5-images
