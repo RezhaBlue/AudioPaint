@@ -96,19 +96,6 @@ function [resultImage] = audioPaint
     C = reshape(C, [cutoff/1920 1920]);
     C = floor(mean(C)*20000); %brings max y-range to 1000, not max y-value
     
-%{
-    %for comparing to original beat filtration, pretty damn good
-    subplot(2,2,1)
-    plot(c)
-    subplot (2,2,2)
-    plot(D)
-    subplot(2,2,3)
-    plot(M)
-    subplot (2,2,4)
-    plot(C)
-
-%}  
-    
     xval = find(M); % x-values
     yval = C(M); %y-values
     
